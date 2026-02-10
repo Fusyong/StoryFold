@@ -1,0 +1,137 @@
+{
+  "name": "storyfold",
+  "displayName": "StoryFold",
+  "description": "LLM-assisted writing workflow for children/YA stories and educational articles inside VS Code.",
+  "version": "0.0.1",
+  "publisher": "ah21",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:storyfold.openWorkbench",
+    "onCommand:storyfold.saveArchive",
+    "onCommand:storyfold.cloneFromArchive"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "storyfold.openWorkbench",
+        "title": "StoryFold: 打开创作工作台"
+      },
+      {
+        "command": "storyfold.refreshWorkbench",
+        "title": "StoryFold: 刷新创作工作台（内部）"
+      },
+      {
+        "command": "storyfold.editBriefField",
+        "title": "StoryFold: 编辑写作要点（brief.json 字段）"
+      },
+      {
+        "command": "storyfold.openOutlineFromJson",
+        "title": "StoryFold: 打开提纲及其备注（只读）"
+      },
+      {
+        "command": "storyfold.editOutlineField",
+        "title": "StoryFold: 编辑提纲及其备注（outline.json 字段）"
+      },
+      {
+        "command": "storyfold.editFinalField",
+        "title": "StoryFold: 编辑最终作品（final.json 字段）"
+      },
+      {
+        "command": "storyfold.editSampleField",
+        "title": "StoryFold: 编辑样段（samples.json 字段）"
+      },
+      {
+        "command": "storyfold.openReview",
+        "title": "StoryFold: 在编辑器中打开审读意见"
+      },
+      {
+        "command": "storyfold.openAgeCheck",
+        "title": "StoryFold: 在编辑器中打开适龄自检报告"
+      },
+      {
+        "command": "storyfold.openArchiveFolder",
+        "title": "StoryFold: 打开创作档案目录"
+      },
+      {
+        "command": "storyfold.saveArchive",
+        "title": "StoryFold: 保存为创作档案"
+      },
+      {
+        "command": "storyfold.cloneFromArchive",
+        "title": "StoryFold: 从档案克隆到当前项目"
+      }
+    ],
+    "configuration": {
+      "title": "StoryFold",
+      "properties": {
+        "storyfold.llm.platform": {
+          "type": "string",
+          "enum": [
+            "deepseek",
+            "aliyun",
+            "google",
+            "ollama"
+          ],
+          "default": "deepseek",
+          "description": "大模型服务平台选择"
+        },
+        "storyfold.llm.apiKeys.deepseek": {
+          "type": "string",
+          "default": "",
+          "description": "DeepSeek API 密钥"
+        },
+        "storyfold.llm.models.deepseek": {
+          "type": "string",
+          "default": "deepseek-chat",
+          "description": "DeepSeek 模型"
+        },
+        "storyfold.llm.models.ollama": {
+          "type": "string",
+          "default": "llama2",
+          "description": "Ollama 本地模型名"
+        },
+        "storyfold.llm.baseUrl.ollama": {
+          "type": "string",
+          "default": "http://localhost:11434",
+          "description": "Ollama 服务地址"
+        },
+        "storyfold.llm.timeout": {
+          "type": "number",
+          "default": 60,
+          "description": "LLM 请求超时（秒）"
+        },
+        "storyfold.llm.retryAttempts": {
+          "type": "number",
+          "default": 2,
+          "description": "失败重试次数"
+        },
+        "storyfold.llm.temperature": {
+          "type": "number",
+          "default": 0.7,
+          "description": "生成温度（0-2）"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc --watch -p ./",
+    "lint": "echo \"no lint yet\"",
+    "package-vsix": "npx vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.3.3",
+    "@vscode/vsce": "^3.3.2"
+  },
+  "dependencies": { "axios": "^1.8.4" }
+}
+
