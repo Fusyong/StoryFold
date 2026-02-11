@@ -47,10 +47,6 @@
         "title": "StoryFold: 在编辑器中打开审读意见"
       },
       {
-        "command": "storyfold.openAgeCheck",
-        "title": "StoryFold: 在编辑器中打开适龄自检报告"
-      },
-      {
         "command": "storyfold.openArchiveFolder",
         "title": "StoryFold: 打开创作档案目录"
       },
@@ -125,9 +121,11 @@
   "devDependencies": {
     "@types/node": "^18.0.0",
     "@types/vscode": "^1.85.0",
-    "typescript": "^5.3.3",
-    "@vscode/vsce": "^3.3.2"
+    "@vscode/vsce": "^3.3.2",
+    "typescript": "^5.3.3"
   },
-  "dependencies": { "axios": "^1.8.4" }
+  "dependencies": {
+    "axios": "^1.8.4",
+    "marked": "^17.0.1"
+  }
 }
-

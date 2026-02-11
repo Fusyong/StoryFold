@@ -1,10 +1,11 @@
 /**
- * 循环改进：修订步骤（Revise）。根据采纳的建议修改内容并写回。MVP 仅支持 phase='final'。
+ * 循环改进：修订步骤（Revise）。根据采纳的建议修改内容并写回。支持 brief 与 final 阶段。
  */
 
 import { Logger } from '../utils';
-import { getFinalJsonPath } from '../storage/projectLayout';
+import { getBriefJsonPath, getFinalJsonPath } from '../storage/projectLayout';
 import { getLlmClient } from '../llm/llmClient';
+import { PROMPT_REVISE_BRIEF, PROMPT_REVISE_FINAL } from '../prompts/llmPrompts';
 import * as fs from 'fs';
 import * as vscode from 'vscode';
 import type { RefinementPhase, RefinementSuggestion } from '../types/refinement';
@@ -19,19 +20,14 @@ export interface ReviseResult {
   revisedContent: string;
 }
 
-const SYSTEM_PROMPT_REVISE_FINAL = `你是一位面向少年儿童内容的编辑。用户将提供一篇「最终作品」和若干条修改建议。请**仅根据这些建议**对正文进行修改，输出修订后的完整正文。要求：
-- 逐条落实建议，不要遗漏；
-- 保持原文风格与结构，仅改建议涉及之处；
-- 直接输出修订后的全文，不要加「修订版」等标题或解释。`;
-
 /**
- * 按采纳的建议修订内容；修订后写回 final.json（仅 final 阶段）。
+ * 按采纳的建议修订内容；修订后写回 brief.json 或 final.json。
  */
 export async function runRevise(input: ReviseInput): Promise<ReviseResult> {
   const logger = Logger.getInstance();
 
-  if (input.phase !== 'final') {
-    logger.info('runRevise: MVP 仅支持 final 阶段');
+  if (input.phase !== 'brief' && input.phase !== 'final') {
+    logger.info('runRevise: 仅支持 brief 与 final 阶段');
     return { revisedContent: input.content };
   }
 
@@ -45,22 +41,33 @@ export async function runRevise(input: ReviseInput): Promise<ReviseResult> {
     .map((s) => `- [${s.type}] ${s.summary}${s.detail ? `\n  ${s.detail}` : ''}`)
     .join('\n');
 
-  const userContent = `【当前正文】\n\n${input.content || '（空）'}\n\n【修改建议（请逐条落实）】\n\n${suggestionsText}`;
+  const isBrief = input.phase === 'brief';
+  const systemPrompt = isBrief ? PROMPT_REVISE_BRIEF : PROMPT_REVISE_FINAL;
+  const contentLabel = isBrief ? '当前写作要点' : '当前正文';
+  const userContent = `【${contentLabel}】\n\n${input.content || '（空）'}\n\n【修改建议（请逐条落实）】\n\n${suggestionsText}`;
 
   try {
     const result = await client.chat(
       [
-        { role: 'system', content: SYSTEM_PROMPT_REVISE_FINAL },
+        { role: 'system', content: systemPrompt },
         { role: 'user', content: userContent },
       ],
       { temperature: 0.3 },
     );
     const revisedContent = result && result.trim() ? result.trim() : input.content;
 
-    const finalPath = getFinalJsonPath();
-    if (finalPath) {
-      fs.writeFileSync(finalPath, JSON.stringify({ text: revisedContent }, null, 2), 'utf8');
-      logger.info('refinementRevise: final.json 已更新');
+    if (isBrief) {
+      const briefPath = getBriefJsonPath();
+      if (briefPath) {
+        fs.writeFileSync(briefPath, JSON.stringify({ text: revisedContent }, null, 2), 'utf8');
+        logger.info('refinementRevise: brief.json 已更新');
+      }
+    } else {
+      const finalPath = getFinalJsonPath();
+      if (finalPath) {
+        fs.writeFileSync(finalPath, JSON.stringify({ text: revisedContent }, null, 2), 'utf8');
+        logger.info('refinementRevise: final.json 已更新');
+      }
     }
 
     return { revisedContent };

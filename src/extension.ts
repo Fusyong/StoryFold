@@ -2,7 +2,8 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import { Logger } from './utils';
 import { WebviewManager } from './ui/webviewManager';
-import { getBriefJsonPath, getFinalJsonPath, getOutlineJsonPath, getSamplesJsonPath, getReviewJsonPath, getAgeCheckJsonPath } from './storage/projectLayout';
+import { getBriefJsonPath, getFinalJsonPath, getOutlineJsonPath, getSamplesJsonPath, getReviewJsonPath } from './storage/projectLayout';
+import { BRIEF_TEMPLATE } from './constants';
 import { openJsonFieldInTempEditor, registerJsonFieldSaveHook } from './storage/jsonFieldEditor';
 import { saveArchive, listArchives, cloneArchive, getArchivesRootUri } from './storage/archiveManager';
 
@@ -43,9 +44,20 @@ export function activate(context: vscode.ExtensionContext) {
         await vscode.window.showErrorMessage('无法确定 brief.json 路径（没有 workspaceFolder？）。');
         return;
       }
+      let defaultText = BRIEF_TEMPLATE;
+      if (fs.existsSync(briefPath)) {
+        try {
+          const obj = JSON.parse(fs.readFileSync(briefPath, 'utf8')) as { text?: string };
+          if (obj.text !== undefined && obj.text !== '') {
+            defaultText = obj.text;
+          }
+        } catch {
+          // ignore
+        }
+      }
       await openJsonFieldInTempEditor(
         { jsonPath: briefPath, field: 'text' },
-        { language: 'markdown', defaultText: '' },
+        { language: 'markdown', defaultText },
       );
     },
   );
@@ -125,21 +137,6 @@ export function activate(context: vscode.ExtensionContext) {
     },
   );
 
-  const openAgeCheckCmd = vscode.commands.registerCommand(
-    'storyfold.openAgeCheck',
-    async () => {
-      const ageCheckPath = getAgeCheckJsonPath();
-      if (!ageCheckPath) {
-        await vscode.window.showErrorMessage('无法确定 ageCheck.json 路径（没有 workspaceFolder？）。');
-        return;
-      }
-      await openJsonFieldInTempEditor(
-        { jsonPath: ageCheckPath, field: 'text' },
-        { language: 'markdown', defaultText: '' },
-      );
-    },
-  );
-
   const openArchiveFolderCmd = vscode.commands.registerCommand(
     'storyfold.openArchiveFolder',
     async () => {
@@ -198,7 +195,6 @@ export function activate(context: vscode.ExtensionContext) {
     editFinalCmd,
     editSampleCmd,
     openReviewCmd,
-    openAgeCheckCmd,
     openArchiveFolderCmd,
     saveArchiveCmd,
     cloneFromArchiveCmd,

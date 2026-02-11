@@ -82,8 +82,10 @@ export function registerJsonFieldSaveHook(context: vscode.ExtensionContext) {
       await vscode.window.showInformationMessage(
         `已将当前文档内容保存回 ${path.basename(jsonPath)} 的字段 ${field}`,
       );
-      // 直接通知工作台刷新当前视图数据（若已打开）
-      WebviewManager.getInstance().refreshFromJson();
+      // 延迟刷新，确保文件写入完成且 webview 能接收消息（后台 tab 时可能需短暂延迟）
+      setTimeout(() => {
+        WebviewManager.getInstance().refreshFromJson();
+      }, 100);
     } catch (err) {
       logger.error(`写入 JSON 失败：${jsonPath}`, err);
       await vscode.window.showErrorMessage(`写入 ${jsonPath} 失败，请查看输出面板。`);

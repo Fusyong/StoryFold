@@ -1,6 +1,7 @@
 import { Logger } from '../utils';
 import { getFinalJsonPath } from '../storage/projectLayout';
 import { getLlmClient } from '../llm/llmClient';
+import { PROMPT_FINAL } from '../prompts/llmPrompts';
 import * as fs from 'fs';
 import * as vscode from 'vscode';
 
@@ -13,12 +14,6 @@ export interface FinalInput {
 export interface FinalResult {
   finalText: string;
 }
-
-const SYSTEM_PROMPT_FINAL = `你是一位面向少年儿童的创作者。请根据用户提供的「写作要点」和「提纲及其备注」，创作一篇完整的最终作品（故事或知识普及文章）。要求：
-- 主线明确，情节清晰，详略得当；
-- 人物有特点，细节具体可感；
-- 保持知识与逻辑严谨，符合目标读者年龄；
-- 直接输出正文，不要加「最终作品」等标题或多余说明。`;
 
 /**
  * 根据写作要点与备注版大纲（及可选样段）生成最终作品。
@@ -45,7 +40,7 @@ export async function runFinalDraft(input: FinalInput): Promise<FinalResult> {
     const userContent = `请根据以下材料创作最终作品：\n\n${parts.join('')}`;
     const result = await client.chat(
       [
-        { role: 'system', content: SYSTEM_PROMPT_FINAL },
+        { role: 'system', content: PROMPT_FINAL },
         { role: 'user', content: userContent },
       ],
       { temperature: 0.7 },

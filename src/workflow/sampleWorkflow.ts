@@ -1,6 +1,7 @@
 import { Logger } from '../utils';
 import { getSamplesJsonPath } from '../storage/projectLayout';
 import { getLlmClient } from '../llm/llmClient';
+import { PROMPT_SAMPLE } from '../prompts/llmPrompts';
 import * as fs from 'fs';
 import * as vscode from 'vscode';
 
@@ -12,12 +13,6 @@ export interface SampleInput {
 export interface SampleResult {
   sampleText: string;
 }
-
-const SYSTEM_PROMPT_SAMPLE = `你是一位面向少年儿童的创作者。请根据用户提供的「写作要点」和「提纲及其备注」，试写一段样章/样段（不必写完整篇）。要求：
-- 风格、人物与设定与写作要点和提纲及其备注一致；
-- 可只写开篇或某一场景的代表性段落，用简洁叙事或对白体现风格与节奏；
-- 若需要省略中间部分，可用简短标记如「……（此处省略若干情节）……」；
-- 直接输出样段正文，不要加「样段」等标题或多余说明。`;
 
 /**
  * 根据写作要点与备注版大纲生成样段。
@@ -40,7 +35,7 @@ export async function runSampleDraft(input: SampleInput): Promise<SampleResult> 
     ].join('\n');
     const result = await client.chat(
       [
-        { role: 'system', content: SYSTEM_PROMPT_SAMPLE },
+        { role: 'system', content: PROMPT_SAMPLE },
         { role: 'user', content: `请根据以下材料试写一段样章/样段：\n\n${userContent}` },
       ],
       { temperature: 0.7 },

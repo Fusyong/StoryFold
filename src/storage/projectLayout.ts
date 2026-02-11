@@ -51,11 +51,6 @@ export function getReviewJsonPath(): string | undefined {
   return base ? path.join(base, 'review.json') : undefined;
 }
 
-export function getAgeCheckJsonPath(): string | undefined {
-  const base = getStoryFoldDir();
-  return base ? path.join(base, 'ageCheck.json') : undefined;
-}
-
 export function getRefinementStatePath(): string | undefined {
   const base = getStoryFoldDir();
   return base ? path.join(base, 'refinementState.json') : undefined;
