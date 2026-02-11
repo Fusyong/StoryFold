@@ -46,7 +46,7 @@ export async function openJsonFieldInTempEditor(
 
   const doc = await vscode.workspace.openTextDocument(tmpPath);
   tempTargets.set(doc.fileName, target);
-  await vscode.window.showTextDocument(doc, vscode.ViewColumn.One);
+  await vscode.window.showTextDocument(doc, { viewColumn: vscode.ViewColumn.Beside });
 }
 
 /**

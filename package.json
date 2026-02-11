@@ -31,10 +31,6 @@
         "title": "StoryFold: 编辑写作要点（brief.json 字段）"
       },
       {
-        "command": "storyfold.openOutlineFromJson",
-        "title": "StoryFold: 打开提纲及其备注（只读）"
-      },
-      {
         "command": "storyfold.editOutlineField",
         "title": "StoryFold: 编辑提纲及其备注（outline.json 字段）"
       },

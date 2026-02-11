@@ -50,39 +50,6 @@ export function activate(context: vscode.ExtensionContext) {
     },
   );
 
-  const openOutlineCmd = vscode.commands.registerCommand(
-    'storyfold.openOutlineFromJson',
-    async () => {
-      const outlinePath = getOutlineJsonPath();
-      if (!outlinePath || !fs.existsSync(outlinePath)) {
-        await vscode.window.showInformationMessage(
-          '尚未找到 outline.json，请先在创作工作台中运行一次流程。',
-        );
-        return;
-      }
-      const raw = fs.readFileSync(outlinePath, 'utf8');
-      let content = '';
-      try {
-        const obj = JSON.parse(raw) as { text?: string; outlineText?: string; annotatedOutlineText?: string };
-        if (obj.text !== undefined && obj.text !== '') {
-          content = obj.text;
-        } else {
-          const o = obj.outlineText ?? '';
-          const a = obj.annotatedOutlineText ?? '';
-          content = o && a ? `${o}\n\n${a}` : o || a;
-        }
-      } catch {
-        content = raw;
-      }
-
-      const doc = await vscode.workspace.openTextDocument({
-        content: content || '（暂无）',
-        language: 'markdown',
-      });
-      await vscode.window.showTextDocument(doc, vscode.ViewColumn.One);
-    },
-  );
-
   const editOutlineCmd = vscode.commands.registerCommand(
     'storyfold.editOutlineField',
     async () => {
@@ -227,7 +194,6 @@ export function activate(context: vscode.ExtensionContext) {
     openWorkbenchCmd,
     refreshWorkbenchCmd,
     editBriefCmd,
-    openOutlineCmd,
     editOutlineCmd,
     editFinalCmd,
     editSampleCmd,

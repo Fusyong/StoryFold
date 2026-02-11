@@ -56,3 +56,8 @@ export function getAgeCheckJsonPath(): string | undefined {
   return base ? path.join(base, 'ageCheck.json') : undefined;
 }
 
+export function getRefinementStatePath(): string | undefined {
+  const base = getStoryFoldDir();
+  return base ? path.join(base, 'refinementState.json') : undefined;
+}
+
